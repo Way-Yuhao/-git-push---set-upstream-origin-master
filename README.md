@@ -2,8 +2,6 @@
 
 See Canvas assignment pages for details of the assignment.
 
-caonima
-
 ## Download and install JDK 8
 
 https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
