@@ -17,7 +17,7 @@ public class MealList {
         if (foodItem == null) throw new NullPointerException();
         mealList.add(foodItem);
     }
-    //DICK WAYNE
+
     //removes a food item from MealList
     public void removeItem(FoodItem foodItem) {
         if (foodItem == null) throw new NullPointerException();
@@ -27,12 +27,27 @@ public class MealList {
 
     //traverses the entire list and adds up all nutrition
     public void analyzeMeal() {
+        nutritionSummary.put("calories", sumNutrition("calories"));
+        nutritionSummary.put("fat", sumNutrition("fat"));
+        nutritionSummary.put("carbohydrate", sumNutrition("carbohydrate"));
+        nutritionSummary.put("fiber", sumNutrition("fiber"));
+        nutritionSummary.put("protein", sumNutrition("protein"));
+    }
 
+    private double sumNutrition(String nutrition) {
+        if (mealList.isEmpty()) return 0;
+
+        double sumNutrition = 0;
+        for (FoodItem curItem : mealList) {
+            double curNutrition = curItem.getNutrientValue(nutrition);
+            sumNutrition += curNutrition;
+        }
+
+        return sumNutrition;
     }
 
     //return the current MealList
     public List<FoodItem> getMealList() {
         return mealList;
     }
-    //Wayne edit
 }
