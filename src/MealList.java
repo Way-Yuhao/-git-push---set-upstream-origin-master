@@ -34,6 +34,11 @@ public class MealList {
         nutritionSummary.put("protein", sumNutrition("protein"));
     }
 
+    //clear the entire MealList
+    public void clearAll() {
+        mealList = new ArrayList<>();
+    }
+
     private double sumNutrition(String nutrition) {
         if (mealList.isEmpty()) return 0;
 
