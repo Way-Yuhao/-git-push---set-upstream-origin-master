@@ -17,7 +17,7 @@ public class MealList {
         if (foodItem == null) throw new NullPointerException();
         mealList.add(foodItem);
     }
-
+    //DICK WAYNE
     //removes a food item from MealList
     public void removeItem(FoodItem foodItem) {
         if (foodItem == null) throw new NullPointerException();
