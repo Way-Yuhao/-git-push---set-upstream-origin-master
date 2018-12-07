@@ -30,13 +30,7 @@ public class FoodItem {
         this.id = id;
         this.name = name;
         this.index = null;
-
-        // Initialize the nutrients HashMap by setting value null
-        nutrients.put("calories", null);
-        nutrients.put("fat", null);
-        nutrients.put("carbohydrate", null);
-        nutrients.put("fiber", null);
-        nutrients.put("protein", null);
+        this.nutrients = new HashMap<String, Double>();
     }
 
     /**
@@ -49,13 +43,7 @@ public class FoodItem {
         this.id = id;
         this.name = name;
         this.index = index;
-
-        // Initialize the nutrients HashMap by setting value null
-        nutrients.put("calories", null);
-        nutrients.put("fat", null);
-        nutrients.put("carbohydrate", null);
-        nutrients.put("fiber", null);
-        nutrients.put("protein", null);
+        this.nutrients = new HashMap<String, Double>();
     }
 
 
@@ -90,8 +78,8 @@ public class FoodItem {
      * Adds a nutrient and its value to this food.
      * If nutrient already exists, updates its value.
      */
-    public void addNutrient(String name, double value) {
-        nutrients.replace(name, nutrients.get(name), value);
+    public void addNutrient(String name, Double value) {
+    	nutrients.put(name, value);
     }
 
     /**
@@ -118,5 +106,15 @@ public class FoodItem {
      */
     public Integer getIndex() {
         return index;
+    }
+    
+    @Override
+    public String toString() {
+    	return id + "," + name + "," 
+    			+ "calories" + "," + nutrients.get("calories").toString() + "," 
+    			+ "fat" + "," + nutrients.get("fat").toString() + "," 
+    			+ "carbohydrate" + "," + nutrients.get("carbohydrate").toString() + "," 
+    			+ "fiber" + "," + nutrients.get("fiber") .toString() + "," 
+    			+ "protein" + "," + nutrients.get("protein").toString();
     }
 }

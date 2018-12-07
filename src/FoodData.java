@@ -1,5 +1,11 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * This class represents the backend for managing all 
@@ -20,7 +26,8 @@ public class FoodData implements FoodDataADT<FoodItem> {
      * Public constructor
      */
     public FoodData() {
-        // TODO : Complete
+        this.foodItemList = new LinkedList<FoodItem>();
+        this.indexes = new HashMap<String, BPTree<Double, FoodItem>>();	
     }
     
     
@@ -48,7 +55,50 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public void loadFoodItems(String filePath) {
-        // TODO : Complete
+        File inputFile = new File(filePath);
+        try {
+        	Scanner sc = new Scanner(inputFile);
+        	while (sc.hasNextLine()) {
+        		int listIndex = 0;
+        		String[] rawDataSet = sc.nextLine().split(",");
+        		if (rawDataSet.length == 0) break;
+        		FoodItem food = new FoodItem(rawDataSet[0], rawDataSet[1]);
+        		int i = 2;
+        		//add nutrition data
+        		while (i <= 11) {
+        			food.addNutrient(rawDataSet[i++], Double.parseDouble(rawDataSet[i++]));
+        		}
+        		//add the new FoodItem to foodItemList with the assigned index
+        		insertionSort(food);
+        	}
+        	globalUpdateIndex();
+        } catch(FileNotFoundException e) {
+        	System.err.println("Input file not found.");
+        }
+    }
+    
+    private void insertionSort(FoodItem newFood) {
+    	if (foodItemList.size() == 0) 
+    		foodItemList.add(newFood);
+    	else {
+    		int listIndex = 0;
+	    	for (FoodItem food: foodItemList) {
+	    		if (newFood.getName().compareTo(food.getName()) <= 0) {
+	    			break;
+	    		} else {
+	    			listIndex++;
+	    		}
+	    	}
+	    	foodItemList.add(listIndex, newFood);
+	    	return;
+    	}
+    }
+    
+    private void globalUpdateIndex() {
+    	int listIndex = 0;
+    	for (FoodItem food: foodItemList) {
+    		food.setIndex(listIndex++);
+    	}
     }
 
     /**
@@ -72,8 +122,16 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public List<FoodItem> filterByName(String substring) {
-        // TODO : Complete
-        return null;
+        if (substring == null) {
+        	return null;
+        } else {
+        	List<FoodItem> matches = new ArrayList<FoodItem>();
+        	for (FoodItem food: foodItemList) {
+        		if (food.getName().contains(substring))
+        			matches.add(food);
+        	}
+        	return matches;
+        }
     }
 
     /**
@@ -99,8 +157,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public List<FoodItem> filterByNutrients(List<String> rules) {
-        // TODO : Complete
-        return null;
+       return this.indexes.get(rules.get(0)).rangeSearch(Double.parseDouble(rules.get(2)), rules.get(1));
     }
 
     /**
@@ -109,7 +166,10 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public void addFoodItem(FoodItem foodItem) {
-        // TODO : Complete
+    	//TODO: duplicate id's?
+    	//TODO: is there a need for randomly generating id
+    	foodItem.setIndex(this.foodItemList.size());
+        this.foodItemList.add(foodItem);
     }
 
     /**
@@ -118,8 +178,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public List<FoodItem> getAllFoodItems() {
-        // TODO : Complete
-        return null;
+        return this.foodItemList;
     }
 
     /**
@@ -129,8 +188,28 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
 	@Override
 	public void saveFoodItems(String filename) {
-		// TODO Auto-generated method stub
+		File file = new File(filename);
+		if (file.exists())
+			System.err.println("File already exists. Please change the file name.");
+		else {
+			try {
+				PrintWriter output = new PrintWriter(file);
+				for (FoodItem food: foodItemList) {
+					output.println(food.toString());
+				}
+			} catch (FileNotFoundException e) {
+				// TODO why this exception?
+				e.printStackTrace();
+			}
+		}
 		
 	}
-
+	
+	///////////////////FOR TESTING PURPOSES//////////////////////
+	public static void main(String[] args) {
+		FoodData fd = new FoodData();
+		fd.loadFoodItems("foodItems.csv");
+		System.out.println("");
+		fd.saveFoodItems("sampleOut.txt");
+	}
 }
