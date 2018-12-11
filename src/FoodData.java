@@ -2,10 +2,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * This class represents the backend for managing all 
@@ -14,20 +18,25 @@ import java.util.Scanner;
  * @author sapan (sapan@cs.wisc.edu)
  */
 public class FoodData implements FoodDataADT<FoodItem> {
-    
     // List of all the food items.
     private List<FoodItem> foodItemList;
 
     // Map of nutrients and their corresponding index
-    private HashMap<String, BPTree<Double, FoodItem>> indexes;
+    private HashMap<String, BPTree<Double, Integer>> indexes;
     
     
     /**
      * Public constructor
      */
     public FoodData() {
+    	
         this.foodItemList = new LinkedList<FoodItem>();
-        this.indexes = new HashMap<String, BPTree<Double, FoodItem>>();	
+        this.indexes = new HashMap<String, BPTree<Double, Integer>>();	
+        this.indexes.put("calories", new BPTree<Double, Integer>(3));
+        this.indexes.put("fat", new BPTree<Double, Integer>(3));
+        this.indexes.put("carbohydrate", new BPTree<Double, Integer>(3));
+        this.indexes.put("fiber", new BPTree<Double, Integer>(3));
+        this.indexes.put("protein", new BPTree<Double, Integer>(3));
     }
     
     
@@ -72,6 +81,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
         		insertionSort(food);
         	}
         	globalUpdateIndex();
+        	addAllToIndexes();
         } catch(FileNotFoundException e) {
         	System.err.println("Input file not found.");
         }
@@ -91,6 +101,15 @@ public class FoodData implements FoodDataADT<FoodItem> {
 	    	}
 	    	foodItemList.add(listIndex, newFood);
 	    	return;
+    	}
+    }
+    
+    private void addAllToIndexes() {
+    	String[] nutritions= {"calories", "carbohydrate", "fat", "fiber", "protein"};
+    	for (String nutrition: nutritions) {
+    		for (FoodItem food: foodItemList) {
+    			this.indexes.get(nutrition).insert(food.getNutrientValue(nutrition), food.getIndex());
+        	}
     	}
     }
     
@@ -157,7 +176,46 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public List<FoodItem> filterByNutrients(List<String> rules) {
-       return this.indexes.get(rules.get(0)).rangeSearch(Double.parseDouble(rules.get(2)), rules.get(1));
+    	//decoding rules
+    	int numOfRules = rules.size();
+    	String[] nuts = new String[numOfRules];
+    	String[][] rulesArr = new String[numOfRules][3];
+    	int i = 0;
+    	for (String rule: rules) {
+    		String[] temp = rules.get(i).split(" ");
+    		rulesArr[i] = new String[] {temp[0], temp[1], temp[2]};
+    		i++;
+    	}
+    	for (int j = 0; j < numOfRules; j++) {
+    		nuts[j] = rulesArr[j][0];
+    	} 
+    	
+    	ArrayList<List<Integer>> sets = new ArrayList<List<Integer>>();
+    	i = 0;
+    	for (String[] singleRuleArr: rulesArr) {
+    		sets.add(singleNutritionFilter(singleRuleArr[0], singleRuleArr[1], singleRuleArr[2]));
+    	}
+    	
+    	HashSet<Integer> intersectionSet = new HashSet<>(sets.get(0));
+    	for (int k = 1; k < sets.size(); k++) {
+    		HashSet<Integer> set = new HashSet<>(sets.get(k));
+    		intersectionSet.retainAll(set);
+    	}
+    	List<Integer> sortedIndexes = new ArrayList<Integer>();
+    	for (Integer link: intersectionSet) {
+    		sortedIndexes.add(link);
+    	}
+    	
+    	List<FoodItem> matches = new ArrayList<FoodItem>();
+    	Collections.sort(sortedIndexes);
+    	for (Integer link: sortedIndexes) {
+    		matches.add(this.foodItemList.get(link));
+    	}
+    	return matches;
+    }
+    
+    private List<Integer> singleNutritionFilter(String nutrition, String comparator, String value) {
+    	return this.indexes.get(nutrition).rangeSearch(Double.parseDouble(value), comparator);
     }
 
     /**
@@ -210,6 +268,10 @@ public class FoodData implements FoodDataADT<FoodItem> {
 		FoodData fd = new FoodData();
 		fd.loadFoodItems("foodItems.csv");
 		System.out.println("");
-		fd.saveFoodItems("sampleOut.txt");
+		List<String> rules = new ArrayList<String>();
+		//rules.add("calories >= 400.0");
+		rules.add("fat >= 19.0");
+		rules.add("fat <= 19.0");
+		System.out.println(fd.filterByNutrients(rules).toString());
 	}
 }
