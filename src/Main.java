@@ -2,22 +2,29 @@
  * Filename:   Main.java
  * Project:    CS400 Final Project
  * Authors:    Ruijian Huang, Yuhao Liu, Huifeng Su, Junheng Wang, Leon Zhang
- *
+ * <p>
  * Semester:   Fall 2018
  * Course:     CS400
- *
+ * <p>
  * Due Date:   10pm, 11/30/2018
  * Version:    1.0
- *
+ * <p>
  * Credits:    None
- *
+ * <p>
  * Bugs:       For now there seems to be no bug
  */
+
 import java.util.ArrayList;
+
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -32,8 +39,8 @@ import javafx.scene.text.Text;
  * This is a GUI class for the purpose of establishing a bridge between users and the final program.
  * It contains all functions required to utilize the function, with information of available foods,
  * current meal selected, and current query applied given to users.
- * @author Ruijian Huang, Yuhao Liu, Huifeng Su, Junheng Wang, Leon Zhang
  *
+ * @author Ruijian Huang, Yuhao Liu, Huifeng Su, Junheng Wang, Leon Zhang
  */
 public class Main extends Application {
     public int width = 1000; // Scene's initial width
@@ -42,13 +49,53 @@ public class Main extends Application {
     /**
      * This method contains all the settings of GUI's layout, with only one primaryStage passed
      * into.
+     *
      * @param primaryStage
      */
+    public String calLowerLimHolder = "";  //saved previous info
+    public String calUpperLimHolder = "";  //saved previous info
+    public String fatLowerLimHolder = "";  //saved previous info
+    public String fatUpperLimHolder = "";  //saved previous info
+    public String carboLowerLimHolder = "";  //saved previous info
+    public String carboUpperLimHolder = "";  //saved previous info
+    public String fiberLowerLimHolder = "";  //saved previous info
+    public String fiberUpperLimHolder = "";  //saved previous info
+    public String proteinLowerLimHolder = "";  //saved previous info
+    public String proteinUpperLimHolder = "";  //saved previous info
+
+    public Double calLower;  //saved previous info
+    public Double calUpper;  //saved previous info
+    public Double fatLower;  //saved previous info
+    public Double fatUpper;  //saved previous info
+    public Double carboLower;  //saved previous info
+    public Double carboUpper;  //saved previous info
+    public Double fiberLower;  //saved previous info
+    public Double fiberUpper;  //saved previous info
+    public Double proteinLower;  //saved previous info
+    public Double proteinUpper;  //saved previous info
+
+
+    //Line Setup 1: calories
+    TextField caloriesLowerLim = new TextField();
+    TextField caloriesUpperLim = new TextField();
+
+    TextField fatLowerLim = new TextField();
+    TextField fatUpperLim = new TextField();
+
+    TextField carboLowerLim = new TextField();
+    TextField carboUpperLim = new TextField();
+
+    TextField fiberLowerLim = new TextField();
+    TextField fiberUpperLim = new TextField();
+
+    TextField proteinLowerLim = new TextField();
+    TextField proteinUpperLim = new TextField();
+
     @Override
     public void start(Stage primaryStage) {
         try {
             BorderPane root = new BorderPane();
-            Scene scene = new Scene(root,width,height);
+            Scene scene = new Scene(root, width, height);
 
             // All ScrollPanes this program needs
             ScrollPane foodSP = new ScrollPane();
@@ -59,7 +106,6 @@ public class Main extends Application {
             HBox biggestBox = new HBox(); // Biggest box to carry vBox1 and vBox2
             VBox vBox1 = new VBox(); // Left side Box containing all elements
             VBox vBox2 = new VBox(); // Right side Box containing all elements
-
 
 
             // Menu bar - setup
@@ -155,7 +201,6 @@ public class Main extends Application {
             foodListGrid.add(testFoodProtein, 6, 1, 1, 1);
 
 
-
             // Setting up each part of the vBox at right
             // Including HBox for Query, GridPane for Query within ScrollPane, HBox for FoodList,
             // GridPane for Foodlist within ScrollPane
@@ -182,7 +227,7 @@ public class Main extends Application {
             // following loop generates an empty table by filling many rows into GridPane
             int itemNum = 100;
             String mlName = " Item";
-            for (Integer i = 1; i <= itemNum; i++){
+            for (Integer i = 1; i <= itemNum; i++) {
                 mlItem.add(new Text(mlName + i.toString()));
             }
 
@@ -192,7 +237,7 @@ public class Main extends Application {
             mealListGrid.add(mcarbohydrate, 4, 0, 1, 1);
             mealListGrid.add(mfiber, 5, 0, 1, 1);
             mealListGrid.add(mprotein, 6, 0, 1, 1); // row one for labels of nutrients
-            for (int i = 0; i < itemNum; i++){
+            for (int i = 0; i < itemNum; i++) {
                 mealListGrid.add(mlItem.get(i), 0, i + 1, 1, 1);
             }
 
@@ -204,18 +249,16 @@ public class Main extends Application {
             sumTitleBox.setSpacing(250);
 
 
-
-
             // Following are wrapping up all components and put them together
 
             // Left side - wrap up
             vBox1.getChildren().addAll(queryBox, querySP, foodListBox, foodSP);
-            vBox1.setPrefWidth(scene.getWidth()/2);
+            vBox1.setPrefWidth(scene.getWidth() / 2);
             vBox1.setVgrow(foodSP, Priority.ALWAYS); // only expanding size of FoodList
 
             // Right side - wrap up
             vBox2.getChildren().addAll(upperRight, mealSP, sumTitleBox, sumSP);
-            vBox2.setPrefWidth(scene.getWidth()/2);
+            vBox2.setPrefWidth(scene.getWidth() / 2);
 
             // ScrollPanes - policies
             // ScrollBar policies
@@ -248,10 +291,23 @@ public class Main extends Application {
             primaryStage.show();
 
 
+
+
+
+
+
+
+
+
+
+
+
+            setDefaultFilter();
             // Add Filter button
             Dialog dialogFilter = new Dialog();
             dialogFilter.initModality(Modality.APPLICATION_MODAL);
             dialogFilter.initOwner(primaryStage);
+            dialogFilter.setTitle("Add Filter");
             //dialogFilter.setHeight();
 
             // GridPane & DialogPane setup
@@ -262,32 +318,219 @@ public class Main extends Application {
             gridDialogFilter.setHgap(10);
             gridDialogFilter.setVgap(10);
 
-            //Line Setup: calories
-            TextField caloriesLowerLim = new TextField();
-            Text textCaloriesFilter = new Text(" < Calories < ");
-            TextField caloriesUpperLim = new TextField();
+            //Line Setup 1: calories
+            Text textCaloriesFilter = new Text(" <    Calories            < ");
+            caloriesLowerLim.setText(calLowerLimHolder);    //load saved previous info to TextField
+            caloriesUpperLim.setText(calUpperLimHolder);    //load saved previous info to TextField
 
-            String calLowerLimHolder = "MOTHERFUCKER";
-            String calUpperLimHolder = "";
-            caloriesLowerLim.setText(calLowerLimHolder);
-            caloriesUpperLim.setText(calUpperLimHolder);
+            //Line Setup 2: fat
+            Text textFatFilter = new Text(" <    Fat                    < ");
+            caloriesLowerLim.setText(fatLowerLimHolder);    //load saved previous info to TextField
+            caloriesUpperLim.setText(fatUpperLimHolder);    //load saved previous info to TextField
 
-            gridDialogFilter.add(caloriesLowerLim, 0, 0, 1, 1);
-            gridDialogFilter.add(textCaloriesFilter, 1, 0, 1, 1);
-            gridDialogFilter.add(caloriesUpperLim, 2, 0, 1, 1);
+            //Line Setup 3: Carbohydrate
+            Text textCarboFilter = new Text(" <    Carbohydrate   < ");
+            caloriesLowerLim.setText(carboLowerLimHolder);    //load saved previous info to TextField
+            caloriesUpperLim.setText(carboUpperLimHolder);    //load saved previous info to TextField
 
-            addQueryButton.setOnAction((event) -> {
+            //Line Setup 4: Fiber
+            Text textFiberFilter = new Text(" <    Fiber                 < ");
+            caloriesLowerLim.setText(fiberLowerLimHolder);    //load saved previous info to TextField
+            caloriesUpperLim.setText(fiberUpperLimHolder);    //load saved previous info to TextField
 
-                dialogFilter.show();
+            //Line Setup 5: Protein
+            Text textProteinFilter = new Text(" <    Protein             < ");
+            caloriesLowerLim.setText(proteinLowerLimHolder);    //load saved previous info to TextField
+            caloriesUpperLim.setText(proteinUpperLimHolder);    //load saved previous info to TextField
+
+            //BUTTON setup
+            // "x" button setup
+            dialogFilter.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+            Node closeButton = dialogFilter.getDialogPane().lookupButton(ButtonType.CLOSE);
+            closeButton.managedProperty().bind(closeButton.visibleProperty());
+            closeButton.setVisible(false);
+            // cancel button setup
+            Button btnCancelFilter = new Button("Cancel");
+            btnCancelFilter.setOnAction(event -> {
+                dialogFilter.close();
+                //FIXME: testing filter functionalities
+                testFilter();
             });
+            // reset button to clean the data
+            Button btnResetFilter = new Button("Reset Filter");
+            btnResetFilter.setOnAction(event -> {
+                calLowerLimHolder = "";
+                calUpperLimHolder = "";
+                carboLowerLimHolder = "";
+                carboUpperLimHolder = "";
+                fatLowerLimHolder = "";
+                fatUpperLimHolder = "";
+                fiberLowerLimHolder = "";
+                fiberUpperLimHolder = "";
+                proteinLowerLimHolder = "";
+                proteinUpperLimHolder = "";
+
+                caloriesLowerLim.setText("");
+                caloriesUpperLim.setText("");
+                carboLowerLim.setText("");
+                carboUpperLim.setText("");
+                fatLowerLim.setText("");
+                fatUpperLim.setText("");
+                fiberLowerLim.setText("");
+                fiberUpperLim.setText("");
+                proteinLowerLim.setText("");
+                proteinUpperLim.setText("");
+                setDefaultFilter();
+
+                //FIXME: testing filter functionalities
+                testFilter();
+            });
+            // Save Button setup
+            Button btnFilterSave = new Button("Save");
+            HBox hBoxBtnFilterSave = new HBox();
+            Text space = new Text("                        ");
+            hBoxBtnFilterSave.getChildren().addAll(space, btnFilterSave);
+            btnFilterSave.setAlignment(Pos.TOP_RIGHT);
+            btnFilterSave.setOnAction(event -> {
+                try {
+                    calLowerLimHolder = caloriesLowerLim.getText();
+                    calUpperLimHolder = caloriesUpperLim.getText();
+                    carboLowerLimHolder = carboLowerLim.getText();
+                    carboUpperLimHolder = carboUpperLim.getText();
+                    fatLowerLimHolder = fatLowerLim.getText();
+                    fatUpperLimHolder = fatUpperLim.getText();
+                    fiberLowerLimHolder = fiberLowerLim.getText();
+                    fiberUpperLimHolder = fiberUpperLim.getText();
+                    proteinLowerLimHolder = proteinLowerLim.getText();
+                    proteinUpperLimHolder = proteinUpperLim.getText();
+
+                    if (!calLowerLimHolder.equals("")) calLower = Double.parseDouble(calLowerLimHolder);
+                    if (!calUpperLimHolder.equals("")) calUpper = Double.parseDouble(calUpperLimHolder);
+                    if (!carboLowerLimHolder.equals("")) carboLower = Double.parseDouble(carboLowerLimHolder);
+                    if (!carboUpperLimHolder.equals("")) carboUpper = Double.parseDouble(carboUpperLimHolder);
+                    if (!fatLowerLimHolder.equals("")) fatLower = Double.parseDouble(fatLowerLimHolder);
+                    if (!fatUpperLimHolder.equals("")) fatUpper = Double.parseDouble(fatUpperLimHolder);
+                    if (!fiberLowerLimHolder.equals("")) fiberLower = Double.parseDouble(fiberLowerLimHolder);
+                    if (!fiberUpperLimHolder.equals("")) fiberUpper = Double.parseDouble(fiberUpperLimHolder);
+                    if (!proteinLowerLimHolder.equals("")) proteinLower = Double.parseDouble(proteinLowerLimHolder);
+                    if (!proteinUpperLimHolder.equals("")) proteinUpper = Double.parseDouble(proteinUpperLimHolder);
+
+                    if (calLower.compareTo(calUpper) >= 0 || carboLower.compareTo(carboUpper) >= 0 ||
+                            fatLower.compareTo(fatUpper) >= 0 || fiberLower.compareTo(fiberUpper) >= 0 ||
+                            proteinLower.compareTo(proteinUpper) >= 0 ||calLower.compareTo(0.0) < 0 ||
+                            carboLower.compareTo(0.0) < 0 ||
+                            fatLower.compareTo(0.0) < 0 || fiberLower.compareTo(0.0) < 0 ||
+                            proteinLower.compareTo(0.0) < 0 ) throw new IllegalArgumentException();
+
+                    dialogFilter.close();
+
+                } catch (NumberFormatException n) {
+                    Alert numberFormatFilter = new Alert(Alert.AlertType.INFORMATION);
+                    numberFormatFilter.setTitle("ERROR");
+                    numberFormatFilter.setHeaderText("Entry Format Error");
+                    numberFormatFilter.setContentText("Filter entered cannot be processed.");
+                    numberFormatFilter.showAndWait();
+                    btnResetFilter.fire();
+                } catch (IllegalArgumentException i){
+                    Alert numberFormatFilter = new Alert(Alert.AlertType.INFORMATION);
+                    numberFormatFilter.setTitle("ERROR");
+                    numberFormatFilter.setHeaderText("Illegal Filter Entry");
+                    numberFormatFilter.setContentText("Please enter legal filter entries. \n   1. Integer or decimal larger or equal to 0 \n   2. [Entry1] < [Nutrient] < [Entry2]: Entry1 should be smaller than Entry2. ");
+                    numberFormatFilter.showAndWait();
+                    btnResetFilter.fire();
+                }
+                //FIXME: testing filter functionalities
+                testFilter();
+            });
+            // filter prompt
+            Text promptFilter1 = new Text("Entry is Optional.");
+            Text promptFilter2 = new Text("Please enter legal integer or decimal number(s).");
+            //fiter gridPane integration
+            int filTableLine = 2;
+            gridDialogFilter.add(promptFilter1, 0, 0, 3, 1);
+            gridDialogFilter.add(promptFilter2, 0, 1, 3, 1);
+
+            gridDialogFilter.add(hBoxBtnFilterSave, 2, filTableLine + 5, 1, 1);
+            gridDialogFilter.add(btnResetFilter, 1, filTableLine + 5, 1, 1);
+            gridDialogFilter.add(btnCancelFilter, 0, filTableLine + 5, 1, 1);
+
+            gridDialogFilter.add(caloriesLowerLim, 0, filTableLine, 1, 1);
+            gridDialogFilter.add(textCaloriesFilter, 1, filTableLine, 1, 1);
+            gridDialogFilter.add(caloriesUpperLim, 2, filTableLine, 1, 1);
+
+            gridDialogFilter.add(fatLowerLim, 0, filTableLine + 1, 1, 1);
+            gridDialogFilter.add(textFatFilter, 1, filTableLine + 1, 1, 1);
+            gridDialogFilter.add(fatUpperLim, 2, filTableLine + 1, 1, 1);
+
+            gridDialogFilter.add(carboLowerLim, 0, filTableLine + 2, 1, 1);
+            gridDialogFilter.add(textCarboFilter, 1, filTableLine + 2, 1, 1);
+            gridDialogFilter.add(carboUpperLim, 2, filTableLine + 2, 1, 1);
+
+            gridDialogFilter.add(fiberLowerLim, 0, filTableLine + 3, 1, 1);
+            gridDialogFilter.add(textFiberFilter, 1, filTableLine + 3, 1, 1);
+            gridDialogFilter.add(fiberUpperLim, 2, filTableLine + 3, 1, 1);
+
+            gridDialogFilter.add(proteinLowerLim, 0, filTableLine + 4, 1, 1);
+            gridDialogFilter.add(textProteinFilter, 1, filTableLine + 4, 1, 1);
+            gridDialogFilter.add(proteinUpperLim, 2, filTableLine + 4, 1, 1);
+
+            addQueryButton.setOnAction((event) -> dialogFilter.show());
 
 
-        } catch(Exception e) {
+
+
+
+            //Filter Table setup
+
+
+
+
+
+
+
+
+
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public void setDefaultFilter() {
+        calLower = 0.0;
+        calLower = 0.0;
+        calUpper = Double.MAX_VALUE;
+        fatLower = 0.0;
+        fatUpper = Double.MAX_VALUE;
+        carboLower = 0.0;
+        carboUpper = Double.MAX_VALUE;
+        fiberLower = 0.0;
+        fiberUpper = Double.MAX_VALUE;
+        proteinLower = 0.0;
+        proteinUpper = Double.MAX_VALUE;
+    }
+
+    //FIXME: testing only
+    public void testFilter(){
+        //FIXME: testing filter functionalities
+        System.out.println("Cal: " + calLower + " " + calUpper);
+        System.out.println("Carbo: " + carboLower + " " + carboUpper);
+        System.out.println("Fat: " + fatLower + " " + fatUpper);
+        System.out.println("Fiber: " + fiberLower + " " + fiberUpper);
+        System.out.println("Protein: " + proteinLower + " " + proteinUpper);
+        System.out.println((calLower.compareTo(calUpper) >= 0 ) + " " + (carboLower.compareTo(carboUpper) >= 0) + " " +
+                (fatLower.compareTo(fatUpper) >= 0) + " " + (fiberLower.compareTo(fiberUpper) >= 0) + " " +
+                (proteinLower.compareTo(proteinUpper) >= 0));
+    }
+}
+
+class FilterTableInnerClass{
+    FilterTableInnerClass(){
+
     }
 }
