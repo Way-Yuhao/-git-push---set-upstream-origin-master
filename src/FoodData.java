@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -118,6 +119,26 @@ public class FoodData implements FoodDataADT<FoodItem> {
     	for (FoodItem food: foodItemList) {
     		food.setIndex(listIndex++);
     	}
+    }
+    
+    public List<FoodItem> globalFilter(String substring, List<String> rules) {
+    	if (substring == null) 
+    		return filterByNutrients(rules);
+    	else if (rules == null)
+    		return filterByName(substring);
+    	else {
+    		List<FoodItem> list1 = filterByNutrients(rules);
+    		List<FoodItem> list2 = filterByName(substring);
+    		Iterator<FoodItem> it = list1.iterator();
+    		while (it.hasNext()) {
+    			FoodItem food = it.next();
+    			if (!list2.contains(food)) {
+    				it.remove();
+    			}
+    		}
+    		return list1;
+    	}
+    		
     }
 
     /**
@@ -272,6 +293,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
 		//rules.add("calories >= 400.0");
 		rules.add("fat >= 19.0");
 		rules.add("fat <= 19.0");
-		System.out.println(fd.filterByNutrients(rules).toString());
+		//System.out.println(fd.filterByNutrients(rules).toString());
+		System.out.println(fd.globalFilter("DingDongs", rules));
 	}
 }
