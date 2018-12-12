@@ -248,7 +248,8 @@ public class FoodData implements FoodDataADT<FoodItem> {
     	//TODO: duplicate id's?
     	//TODO: is there a need for randomly generating id
     	foodItem.setIndex(this.foodItemList.size());
-        this.foodItemList.add(foodItem);
+       insertionSort(foodItem);
+       globalUpdateIndex();
     }
 
     /**
