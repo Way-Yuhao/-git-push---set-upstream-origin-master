@@ -15,9 +15,11 @@
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -34,6 +36,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.control.CheckBox;
 
 /**
  * This is a GUI class for the purpose of establishing a bridge between users and the final program.
@@ -96,6 +99,7 @@ public class Main extends Application {
         try {
             BorderPane root = new BorderPane();
             Scene scene = new Scene(root, width, height);
+            MealList mealList = new MealList();
 
             // All ScrollPanes this program needs
             ScrollPane foodSP = new ScrollPane();
@@ -184,15 +188,14 @@ public class Main extends Application {
 
             // following code is for demonstration of the composition of foodList
             // TODO: delete this after milestone 2
-            Button addToMealButton = new Button();
-            addToMealButton.setText("+"); // Button for adding food to meal plan
+
             Text testFoodName = new Text(" Apple pie");
             Text testFoodCalories = new Text(" 1000");
             Text testFoodFat = new Text(" 900");
             Text testFoodCarbohydrate = new Text(" 800");
             Text testFoodFiber = new Text(" 700");
             Text testFoodProtein = new Text(" 600");
-            foodListGrid.add(addToMealButton, 0, 1, 1, 1);
+
             foodListGrid.add(testFoodName, 1, 1, 1, 1);
             foodListGrid.add(testFoodCalories, 2, 1, 1, 1);
             foodListGrid.add(testFoodFat, 3, 1, 1, 1);
@@ -479,8 +482,54 @@ public class Main extends Application {
 
 
 
+            //Clear All button by Leon
+            clearBtn.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    mealList.clearAll();
+                }
+            });
 
-            //Filter Table setup
+            //Generate Summary button by Leon
+            sumBtn.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    GridPane summaryGP = new GridPane();
+                    HashMap<String, Double> nutritionSummary = mealList.getNutritionSummary();
+
+                    summaryGP.setHgap(70.0);
+                    summaryGP.setVgap(20.0);
+                    Text sum = new Text("                   " +
+                            "                                         Summary");
+                    Text sumCal = new Text(" Total Calories");
+                    Text sumFat = new Text(" Total Fat");
+                    Text sumCar = new Text(" Total Carbohydrate");
+                    Text sumFiber = new Text(" Total Fiber");
+                    Text sumPro = new Text(" Total Protein");
+
+                    summaryGP.add(sum, 0, 0, 2, 1);
+                    summaryGP.add(sumCal, 0, 1);
+                    summaryGP.add(sumFat, 0, 2);
+                    summaryGP.add(sumCar, 0, 3);
+                    summaryGP.add(sumFiber, 0, 4);
+                    summaryGP.add(sumPro, 0, 5);
+
+                    mealList.analyzeMeal();
+                    Text digitCal = new Text(nutritionSummary.get("calories").toString());
+                    Text digitFat = new Text(nutritionSummary.get("fat").toString());
+                    Text digitCar = new Text(nutritionSummary.get("carbohydrate").toString());
+                    Text digitFiber = new Text(nutritionSummary.get("fiber").toString());
+                    Text digitPro = new Text(nutritionSummary.get("protein").toString());
+
+                    summaryGP.add(digitCal, 1, 1);
+                    summaryGP.add(digitFat, 1, 2);
+                    summaryGP.add(digitCar, 1, 3);
+                    summaryGP.add(digitFiber, 1, 4);
+                    summaryGP.add(digitPro, 1, 5);
+
+                    sumSP.setContent(summaryGP);
+                }
+            });
 
 
 
